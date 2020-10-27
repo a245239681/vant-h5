@@ -4,7 +4,7 @@
       <van-image class="img-responsive" :src="tips" />
     </div>
     <div class="just-list">
-      <p class="pt50 text">{{ psMsg }}</p>
+      <p class="pt50 text-nodata">{{ psMsg }}</p>
     </div>
   </div>
 </template>
@@ -28,10 +28,10 @@ export default {
   display: block;
 }
 .p70 {
-  padding: 0 144px;
+  padding: 0 204px;
 }
 .p280 {
-  padding-top: 280px;
+  padding-top: 30px;
 }
 .pt50 {
   padding-top: 50px;
@@ -47,10 +47,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.text {
-  font-size: 32px;
-  font-weight: bold;
-  color: rgba(102, 102, 102, 1);
+.text-nodata {
+  font-size: 30px;
+  font-weight: 500;
+  color: #666666;
   line-height: 60px;
 }
 .black {

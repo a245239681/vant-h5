@@ -8,6 +8,8 @@ import './assets/css/reset.css'
 import './assets/css/border.css'
 import routers from '@/utils/routers'
 import apiAjax from '@/utils/http'
+import VueSignature from 'vue-signature-simple'
+import vueEsign from 'vue-esign'
 import {
   Button,
   NavBar,
@@ -48,6 +50,8 @@ import {
   Steps,
   Sticky,
   Checkbox,
+  Uploader,
+  ImagePreview,
 } from 'vant'
 Vue.use(Button)
   .use(NavBar)
@@ -88,6 +92,10 @@ Vue.use(Button)
   .use(Steps)
   .use(Sticky)
   .use(Checkbox)
+  .use(VueSignature)
+  .use(vueEsign)
+  .use(Uploader)
+  .use(ImagePreview)
 
 Vue.config.productionTip = false
 Vue.prototype.$token = routers

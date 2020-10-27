@@ -1,26 +1,19 @@
 <template>
   <div class="p280">
-    <div class="p70">
+    <div class=" p70">
       <van-image class="img-responsive" :src="tips" />
     </div>
     <div class="just-list">
-      <p class="pt50 text">查询无记录</p>
-    </div>
-    <div class="just-list">
-      <p class="f12 pt10">
-        <span class="red">温馨提示: </span>
-        <span class="black">南宁、柳州、居民社保暂不支持此业务</span>
-      </p>
+      <p class="pt50 text-nodata">功能升级中，敬请期待。</p>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Tips',
   data() {
     return {
-      tips: require('@/assets/images/no.png'),
+      tips: require('@/assets/images/notice.png'),
     }
   },
 }
@@ -33,7 +26,7 @@ export default {
   display: block;
 }
 .p70 {
-  padding: 0 209px;
+  padding: 0 204px;
 }
 .p280 {
   padding-top: 30px;
@@ -52,10 +45,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.text {
-  font-size: 32px;
-  font-weight: bold;
-  color: rgba(102, 102, 102, 1);
+.text-nodata {
+  font-size: 30px;
+  font-weight: 500;
+  color: #666666;
   line-height: 60px;
 }
 .black {

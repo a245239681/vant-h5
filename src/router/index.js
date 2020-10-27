@@ -342,6 +342,78 @@ const routes = [
       title: '公告',
     },
   },
+  {
+    path: '/progress',
+    name: 'Progress',
+    component: () => import('../views/progress/list.vue'),
+    meta: {
+      title: '办事进度',
+    },
+  },
+  {
+    path: '/progress-details',
+    name: 'ProgressDetails',
+    component: () => import('../views/progress/details.vue'),
+    meta: {
+      title: '办事进度详情',
+    },
+  },
+  {
+    path: '/details-test',
+    name: 'DetailsTest',
+    component: () => import('../views/progress/details-test.vue'),
+    meta: {
+      title: '办事进度详情测试',
+    },
+  },
+  {
+    path: '/progress-pdf',
+    name: 'ProgressPdf',
+    component: () => import('../views/progress/pdf.vue'),
+    meta: {
+      title: '办事进度结果',
+    },
+  },
+  {
+    path: '/auxiliary',
+    name: 'Auxiliary',
+    component: () => import('../views/auxiliary/index.vue'),
+    meta: {
+      title: '失业补助金终止',
+    },
+  },
+  {
+    path: '/toExamine',
+    name: 'ToExamine',
+    component: () => import('../views/progress/toExamine.vue'),
+    meta: {
+      title: '提交成功',
+    },
+  },
+  {
+    path: '/resident',
+    name: 'Resident',
+    component: () => import('../views/resident/from.vue'),
+    meta: {
+      title: '居民参保登记',
+    },
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../views/resident/test.vue'),
+    meta: {
+      title: '测试签名',
+    },
+  },
+  {
+    path: '/up',
+    name: 'Up',
+    component: () => import('@/components/upgrade.vue'),
+    meta: {
+      title: '升级维护',
+    },
+  },
 ]
 
 const router = new VueRouter({

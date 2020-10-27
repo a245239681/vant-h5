@@ -34,10 +34,10 @@ export default {
   display: block;
 }
 .p70 {
-  padding: 0 144px;
+  padding: 0 204px;
 }
 .p280 {
-  padding-top: 280px;
+  padding-top: 30px;
 }
 .pt50 {
   padding-top: 50px;

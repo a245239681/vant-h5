@@ -33,12 +33,75 @@ function ajaxPost(url, params, callfunc, async) {
       Toast('系统异常,请重试!')
     })
 }
+function postRequest(url, params) {
+  return new Promise((resolve, reject) => {
+    let userToken = getToken() || ''
+    const loadings = Toast.loading({
+      message: '加载中...',
+      forbidClick: true,
+      duration: 0,
+    })
+    axios({
+      method: 'POST',
+      url: apiurl + url,
+      data: qs.stringify(params),
+      withCredentials: false,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'XX-Token': userToken,
+      },
+    })
+      .then(res => {
+        resolve(res)
+        loadings.clear()
+      })
+      .catch(res => {
+        reject(res)
+        loadings.clear()
+      })
+  })
+}
+// 文件流表单
+function upLoaderImg(url, params) {
+  const loadings = Toast.loading({
+    message: '上传中...',
+    forbidClick: true,
+    duration: 0,
+  })
+  let config = {
+    headers: {
+      //添加请求头
+      'Content-Type': 'multipart/form-data',
+    },
+  }
+  return new Promise((resolve, reject) => {
+    axios
+      .post(apiurl + url, params, config)
+      .then(res => {
+        if (res) {
+          //如果为真 resolve出去
+          resolve(res)
+          loadings.clear()
+        } else {
+          //否则
+          reject(res)
+          loadings.clear()
+        }
+      })
+      .catch(err => {
+        reject(err)
+        loadings.clear()
+      })
+  })
+}
 
 function getToken() {
   return localStorage.getItem('XX-Token')
 }
 
 export default {
+  upLoaderImg: upLoaderImg,
+  postRequest: postRequest,
   postJson: function(url, params) {
     let call = arguments[2] || null
     let asyncAjax = arguments[3] || false

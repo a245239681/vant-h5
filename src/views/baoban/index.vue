@@ -51,7 +51,7 @@ export default {
           title: '社会保障卡',
           details: '申领',
           icon: require('@/assets/images/baoban/42.png'),
-          url: '/notice',
+          url: 'https://gxrswx.healthan.net/card/home/goToGatherData',
         },
         {
           title: '社会保障卡启用',
@@ -76,7 +76,7 @@ export default {
         //   details: '补卡',
         //   icon: require('@/assets/images/baoban/45.png'),
         //   url:
-        //     'https://openid-gxrswx.healthan.net/index.php/Home/Home/openidByUrl?url=http://h5.gxrswx.healthan.net/cardReplacement',
+        //     'https://openid-gxrswx.healthan.net/index.php/Home/Home/openidByUrl?url=https://h5-gxrswx.healthan.net/cardReplacement',
         // },
         {
           title: '社会保障卡',
@@ -125,6 +125,7 @@ export default {
     go(item) {
       if (
         item.title + item.details === '社会保障卡启用(社保功能激活)' ||
+        item.title + item.details === '社会保障卡申领' ||
         item.title + item.details === '社会保障卡补卡'
       ) {
         window.location.href = item.url

@@ -118,7 +118,7 @@ export default {
             // console.log(res.data.data)
             let pdf = JSON.stringify(res.data.data.pdf)
             that.$token.setToken('bill-pdf', pdf)
-            window.location.href = 'http://h5.gxrswx.healthan.net/bill-pdf'
+            window.location.href = 'https://h5-gxrswx.healthan.net/bill-pdf'
             // that.$router.push({
             //   name: 'Billpdf',
             // })

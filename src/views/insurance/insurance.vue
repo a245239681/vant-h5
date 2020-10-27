@@ -258,7 +258,7 @@ export default {
           if (res.data.code === 0) {
             let pdf = JSON.stringify(res.data.data.pdf)
             _this.$token.setToken('pdf', pdf)
-            window.location.href = 'http://h5.gxrswx.healthan.net/insurancepdf'
+            window.location.href = 'https://h5-gxrswx.healthan.net/insurancepdf'
             // _this.$router.push({
             //   name: 'Insurancepdf',
             //   query: {

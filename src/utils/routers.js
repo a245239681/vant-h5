@@ -35,7 +35,7 @@ function getCode(o) {
     // 如果没有code，则去请求
     window.location.href =
       'https://gxrswx.healthan.net/access/home/getGxrswxCode?code_redirect_uri=' +
-      'http://' +
+      'https://' +
       local[1]
   } else {
     /**
@@ -70,7 +70,7 @@ async function getTokens() {
   let isSuccess = false
   await axios({
     method: 'POST',
-    url: 'http://hdapi.gxrswx.healthan.net/api/gxrswx/login/getToken',
+    url: 'https://api-gxrswx.healthan.net/api/gxrswx/login/getToken',
     data: data,
     withCredentials: false,
     headers: {

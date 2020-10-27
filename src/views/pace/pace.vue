@@ -69,9 +69,7 @@ export default {
       ],
     }
   },
-  created() {
-    this.$token.getToken()
-  },
+  created() {},
   methods: {
     // 查询选择
     onConfirm(value) {
@@ -82,7 +80,9 @@ export default {
       const matchIDCard = /^([1-6][1-9]|50)\d{4}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
       if (values.type === '查询本人') {
         let url = '/api/gxrswx/Card/cardPlan'
-        this.getData(url, {})
+        this.$token.getToken().then(() => {
+          this.getData(url, {})
+        })
       } else if (values.type === '帮他人查询') {
         if (values.username === '') {
           this.$toast.fail('请输入姓名')

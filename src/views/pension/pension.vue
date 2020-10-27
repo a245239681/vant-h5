@@ -286,6 +286,7 @@ export default {
 .info-text .input-list {
   color: #333333;
   font-weight: bold;
+  text-align: right;
 }
 .just-end {
   display: flex;

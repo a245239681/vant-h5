@@ -91,7 +91,7 @@
                     <van-col
                       span="24"
                       :key="i"
-                      @click="goUrl(items.url)"
+                      @click="goUrl(items)"
                       v-for="(items, i) in item.children"
                     >
                       <van-row class="just-list h88 f28">
@@ -134,7 +134,8 @@ export default {
             },
             {
               name: '缴费信息查询',
-              url: '/prove',
+              // url: '/prove',
+              url: '/up',
             },
             {
               name: '参保信息查询',
@@ -266,6 +267,10 @@ export default {
               url:
                 'https://gxrswx.healthan.net/sb/social/sySelectPerson?location=/sb/social/sySubsidy',
             },
+            {
+              name: '失业补助金终止',
+              url: '/auxiliary',
+            },
           ],
         },
         {
@@ -326,14 +331,16 @@ export default {
       }
     },
     go(item) {
-      console.log(2)
       item.name === '待遇测算'
         ? (window.location.href = item.url)
         : this.$router.push(item.url)
     },
-    goUrl(url) {
-      console.log(2)
-      window.location.href = url
+    goUrl(item) {
+      if (item.name === '失业补助金终止') {
+        this.$router.push(item.url)
+      } else {
+        window.location.href = item.url
+      }
     },
     setItem(key, value) {
       localStorage.setItem(key, value)
@@ -386,7 +393,7 @@ export default {
 }
 .h100 {
   min-height: 100px;
-  border-bottom: solid 1px #e8e6e8;
+  border-bottom: solid 2px #e8e6e8;
   background-color: #fff;
   font-weight: bold;
   color: rgba(17, 17, 17, 1);
@@ -395,7 +402,7 @@ export default {
   min-height: 88px;
   background-color: #fdfafe;
   padding: 0 30px;
-  border-bottom: solid 1px #e8e6e8;
+  border-bottom: solid 2px #e8e6e8;
 }
 
 .just-list {
