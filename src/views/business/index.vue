@@ -220,6 +220,16 @@ export default {
             },
           ],
         },
+        {
+          name: '城乡居民养老保险',
+          icon: require('@/assets/images/icon/12.png'),
+          children: [
+            {
+              name: '居民参保登记受理进度查询',
+              url: '/query',
+            },
+          ],
+        },
       ],
       list2: [
         {
@@ -289,6 +299,16 @@ export default {
             },
           ],
         },
+        {
+          name: '城乡居民养老保险',
+          icon: require('@/assets/images/icon/x12.png'),
+          children: [
+            {
+              name: '居民参保登记',
+              url: '/resident',
+            },
+          ],
+        },
       ],
     }
   },
@@ -336,7 +356,7 @@ export default {
         : this.$router.push(item.url)
     },
     goUrl(item) {
-      if (item.name === '失业补助金终止') {
+      if (item.name === '失业补助金终止' || item.name === '居民参保登记') {
         this.$router.push(item.url)
       } else {
         window.location.href = item.url

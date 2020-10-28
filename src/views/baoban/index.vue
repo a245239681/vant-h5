@@ -57,7 +57,7 @@ export default {
           title: '社会保障卡启用',
           details: '(社保功能激活)',
           icon: require('@/assets/images/baoban/41.png'),
-          url: 'https://gxrswx.healthan.net/card/log/cardActLogin',
+          url: 'https://gxrswx.healthan.net/card/home/cardActLogin',
         },
         {
           title: '社会保障卡',

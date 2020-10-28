@@ -399,6 +399,30 @@ const routes = [
     },
   },
   {
+    path: '/query',
+    name: 'Query',
+    component: () => import('../views/resident/query.vue'),
+    meta: {
+      title: '居民参保登记受理进度查询',
+    },
+  },
+  {
+    path: '/residentList',
+    name: 'ResidentList',
+    component: () => import('../views/resident/list.vue'),
+    meta: {
+      title: '居民参保登记受理进度查询列表',
+    },
+  },
+  {
+    path: '/residentDetails',
+    name: 'ResidentDetailst',
+    component: () => import('../views/resident/details.vue'),
+    meta: {
+      title: '居民参保登记受理进度查询详情',
+    },
+  },
+  {
     path: '/test',
     name: 'test',
     component: () => import('../views/resident/test.vue'),
