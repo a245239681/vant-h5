@@ -438,6 +438,14 @@ const routes = [
       title: '升级维护',
     },
   },
+  {
+    path: '/priceNotice',
+    name: 'PriceNotice',
+    component: () => import('../views/shebao/notice.vue'),
+    meta: {
+      title: '缴费业务',
+    },
+  },
 ]
 
 const router = new VueRouter({

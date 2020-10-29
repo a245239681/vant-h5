@@ -25,7 +25,7 @@ function getCode(o) {
   code = ''
   let local = window.location.href // 获取页面url
   local = local.split('//')
-  console.log(local[1])
+  // console.log(local[1])
   code = getUrlCode().code // 截取code
   if (o === '-1') {
     code = ''
