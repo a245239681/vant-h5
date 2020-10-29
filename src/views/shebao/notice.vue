@@ -165,7 +165,4 @@ html {
 .rich_media_content fieldset {
   min-width: 0;
 }
-. {
-  margin-bottom: 10px;
-}
 </style>
