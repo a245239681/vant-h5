@@ -194,10 +194,6 @@ export default {
       }
       return val
     },
-    // onSelect(item) {
-    //   this.showGrade = false
-    //   this.grade = item.name
-    // },
     async getAddress() {
       let _this = this
       let address = localStorage.getItem('address')

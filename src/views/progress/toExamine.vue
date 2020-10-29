@@ -11,7 +11,7 @@
         <span class="togrey">可在“办事进度"页面查看审核进度结果</span>
       </p>
     </div>
-    <div class="just-list pt50 goBtn" v-if="acpt_no !== ''">
+    <div class="just-list pt50 goBtn">
       <van-button
         plain
         size="large"
@@ -39,13 +39,17 @@ export default {
   },
   methods: {
     toGO() {
-      this.$router.push({
-        name: 'ProgressDetails',
-        query: {
-          id: this.acpt_no,
-          code: this.yab139,
-        },
-      })
+      if (this.acpt_no === '') {
+        this.$router.push('/query')
+      } else {
+        this.$router.push({
+          name: 'ProgressDetails',
+          query: {
+            id: this.acpt_no,
+            code: this.yab139,
+          },
+        })
+      }
     },
   },
 }

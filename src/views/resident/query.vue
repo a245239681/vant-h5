@@ -78,7 +78,7 @@ export default {
           },
         })
       }
-      if (data.code === 3000) {
+      if (data.code === 3000 || data.code === 2000) {
         this.$toast(data.msg)
       }
     },

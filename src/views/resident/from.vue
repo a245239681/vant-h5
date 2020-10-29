@@ -162,11 +162,9 @@
               input-align="right"
               required
               readonly
-              is-link
               label="参保日期"
               placeholder="请选择参保日期"
               name="aac030_170"
-              @click="getTime"
               v-model="info.aac030_170"
             />
             <van-field
@@ -207,7 +205,7 @@
                 <div class="autograph">
                   <div
                     class="box just-list"
-                    v-if="tableImg === ''"
+                    v-if="signImg === ''"
                     @click="goSign('')"
                   >
                     <div>
@@ -218,9 +216,9 @@
                   <div
                     class="just-list box-imgs"
                     @click="goSign('')"
-                    v-if="tableImg !== ''"
+                    v-if="signImg !== ''"
                   >
-                    <van-image class="img-responsive" :src="tableImg" />
+                    <van-image class="img-responsive" :src="signImg" />
                   </div>
                   <div class="text">(点击前往签名即可自动生成登记表)</div>
                 </div>
@@ -228,7 +226,7 @@
               <!--材料上传-->
               <div v-for="(item, inx) in fileList.slice(1, 3)" :key="inx">
                 <h3>
-                  <span class="required-red">*</span>
+                  <span v-if="inx !== 1" class="required-red">*</span>
                   <span class="title">
                     {{ inx + 2 }}、{{ item.doc_name }}
                   </span>
@@ -241,7 +239,7 @@
                       :max-count="5"
                       :name="inx + 1"
                       :after-read="afterRead"
-                      @delete="delImg"
+                      :before-delete="delImg"
                       max-size="5120byte"
                       accept="image/*,.png,.jpg,.jpeg"
                     />
@@ -614,7 +612,7 @@ export default {
           doc: [],
         },
         {
-          doc_name: '身份证件和户口簿',
+          doc_name: '身份证件(正反面)和户口簿',
           doc_code: 'D11977',
           scan_num: '1',
           bz: '',
@@ -632,6 +630,7 @@ export default {
 
       isSign: false, // 是否签名中
       tableImg: '', // 生成表格图片
+      signImg: '', // 签名后的图片
       // 签名属性设置
       lineWidth: 3,
       lineColor: '#000000',
@@ -651,6 +650,9 @@ export default {
     prev() {
       --this.active
       this.active < 0 ? (this.active = 0) : this.active
+      if (this.active === 1) {
+        this.resultImg = ''
+      }
     },
     async next() {
       if (this.active === 0) {
@@ -678,8 +680,8 @@ export default {
           this.$toast('请选择户口性质')
           return
         }
-        if (this.info.address === '') {
-          this.$toast('请填写户籍所在地址')
+        if (this.info.aac010 === '') {
+          this.$toast('请填写户籍所在地')
           return
         }
         if (this.info.aae005 === '') {
@@ -705,7 +707,7 @@ export default {
           return
         }
         if (this.info.rural === '') {
-          this.$toast('请选择区县')
+          this.$toast('请选择乡镇')
           return
         }
         if (this.info.community === '') {
@@ -978,6 +980,10 @@ export default {
         aac006: this.info.aac006,
         aac009: this.info.aac009,
       }
+      if (modal.cab139 === '') {
+        this.$toast('请选择社区')
+        return
+      }
       let { data } = await this.$http.postRequest(
         '/api/gxrswx/Residentbase/getAac030_170ByAac009',
         modal
@@ -1045,8 +1051,9 @@ export default {
       if (res.code === 3001) {
         file.status = 'failed'
         file.message = '上传失败'
+        that.$toast.fail(res.msg)
       }
-      // console.log(that.fileList)
+      console.log(that.fileList)
       // file.status = 'uploading'
       // file.message = '上传中...'
 
@@ -1068,9 +1075,11 @@ export default {
     handleClick() {
       // console.log(item)
     },
+    // api/gxrswx/Basedata/updateFileTest 上传测试接口
+    // /api/gxrswx/Basedata/updateFile 正式接口
     async upLoader(params) {
       let { data } = await this.$http.upLoaderImg(
-        '/api/gxrswx/Basedata/updateFile',
+        '/api/gxrswx/Basedata/updateFileTest',
         params
       )
 
@@ -1110,7 +1119,9 @@ export default {
         this.tableImg = 'data:image/png;base64,' + data.data.jpeg
         this.images = []
         this.images.push(this.tableImg)
-        img ? (this.showSign = false) : (this.isSign = true)
+        img
+          ? ((this.showSign = false), (this.signImg = this.tableImg))
+          : ((this.isSign = true), (this.signImg = ''), (this.resultImg = ''))
       }
     },
     // 关闭签名
@@ -1202,8 +1213,8 @@ export default {
       let fild = false
       try {
         // 执行到第4次，结束循环
-        filelist.forEach(function(item) {
-          if (item.doc.length === 0) {
+        filelist.forEach(function(item, index) {
+          if (item.doc.length === 0 && index !== 2) {
             fild = true
           }
         })
@@ -1256,6 +1267,7 @@ export default {
             this.$toast(data.msg)
           }
         })
+        .catch(() => {})
 
       // console.log(modal)
       // console.log(this.fileList)
@@ -1401,5 +1413,8 @@ export default {
 }
 .resident-from .van-step--horizontal .van-step__icon {
   font-size: 30px;
+}
+.van-ellipsis {
+  line-height: 50px;
 }
 </style>
