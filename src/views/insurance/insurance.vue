@@ -258,13 +258,11 @@ export default {
           if (res.data.code === 0) {
             let pdf = JSON.stringify(res.data.data.pdf)
             _this.$token.setToken('pdf', pdf)
-            window.location.href = 'https://h5-gxrswx.healthan.net/insurancepdf'
-            // _this.$router.push({
-            //   name: 'Insurancepdf',
-            //   query: {
-            //     data: list,
-            //   },
-            // })
+            localStorage.removeItem('timer')
+            // window.location.href = 'http://192.168.3.141:8080/insurancepdf'
+            _this.$router.push({
+              name: 'Insurancepdf',
+            })
           }
           if (res.data.code === 3000) {
             setTimeout(() => {

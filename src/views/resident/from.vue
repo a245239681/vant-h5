@@ -1141,8 +1141,8 @@ export default {
           this.resultImg = res
           // console.log(this.resultImg)
         })
-        .catch(err => {
-          this.$toast(err) // 画布没有签字时会执行这里 'Not Signned'
+        .catch(() => {
+          this.$toast('请进行签名') // 画布没有签字时会执行这里 'Not Signned'
         })
     },
     // 上传登记表

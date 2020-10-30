@@ -101,6 +101,7 @@ export default {
       idx: -1,
       load: null,
       showTips: false,
+      timer: '1',
     }
   },
   created() {
@@ -109,6 +110,16 @@ export default {
       url: 'data:application/pdf;base64,' + JSON.parse(pdfs),
       CMapReaderFactory,
     })
+    console.log(123)
+
+    setTimeout(() => {
+      let that = this
+      let timer = localStorage.getItem('timer')
+      if (timer !== that.timer) {
+        this.$token.setToken('timer', '1')
+        location.reload()
+      }
+    }, 1500)
   },
   mounted: function() {},
   methods: {
