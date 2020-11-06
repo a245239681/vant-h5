@@ -423,11 +423,11 @@ const routes = [
     },
   },
   {
-    path: '/activation',
-    name: 'Activation',
-    component: () => import('../views/resident/activation.vue'),
+    path: '/text',
+    name: 'text',
+    component: () => import('../views/resident/text.vue'),
     meta: {
-      title: '社会保障卡启用(社保功能激活)',
+      title: '测试',
     },
   },
   {
