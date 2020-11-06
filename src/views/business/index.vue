@@ -220,16 +220,16 @@ export default {
             },
           ],
         },
-        {
-          name: '城乡居民养老保险',
-          icon: require('@/assets/images/icon/12.png'),
-          children: [
-            {
-              name: '居民参保登记受理进度查询',
-              url: '/query',
-            },
-          ],
-        },
+        // {
+        //   name: '城乡居民养老保险',
+        //   icon: require('@/assets/images/icon/12.png'),
+        //   children: [
+        //     {
+        //       name: '居民参保登记受理进度查询',
+        //       url: '/query',
+        //     },
+        //   ],
+        // },
       ],
       list2: [
         {
@@ -299,16 +299,16 @@ export default {
             },
           ],
         },
-        {
-          name: '城乡居民养老保险',
-          icon: require('@/assets/images/icon/x12.png'),
-          children: [
-            {
-              name: '居民参保登记',
-              url: '/resident',
-            },
-          ],
-        },
+        // {
+        //   name: '城乡居民养老保险',
+        //   icon: require('@/assets/images/icon/x12.png'),
+        //   children: [
+        //     {
+        //       name: '居民参保登记',
+        //       url: '/resident',
+        //     },
+        //   ],
+        // },
       ],
     }
   },
