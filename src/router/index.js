@@ -431,6 +431,14 @@ const routes = [
     },
   },
   {
+    path: '/activation',
+    name: 'Activation',
+    component: () => import('../views/resident/activation.vue'),
+    meta: {
+      title: '社会保障卡启用(社保功能激活)',
+    },
+  },
+  {
     path: '/up',
     name: 'Up',
     component: () => import('@/components/upgrade.vue'),
