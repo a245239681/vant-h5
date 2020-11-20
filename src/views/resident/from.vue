@@ -1053,14 +1053,6 @@ export default {
         file.message = '上传失败'
         that.$toast.fail(res.msg)
       }
-      console.log(that.fileList)
-      // file.status = 'uploading'
-      // file.message = '上传中...'
-
-      // setTimeout(() => {
-      //   file.status = 'failed'
-      //   file.message = '上传失败'
-      // }, 1000)
     },
     // 点击删除图片
     delImg(file, name) {
@@ -1212,7 +1204,6 @@ export default {
       }))
       let fild = false
       try {
-        // 执行到第4次，结束循环
         filelist.forEach(function(item, index) {
           if (item.doc.length === 0 && index !== 2) {
             fild = true

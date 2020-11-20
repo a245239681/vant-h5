@@ -17,7 +17,7 @@
           </van-col>
           <van-col span="12" class="just-end"
             ><span class="just-list" @click="showTime = true"
-              >年份: <span class="fc">{{ year }}年</span>
+              >年份: <span class="fc">{{ timeCode }}年</span>
               <van-icon name="arrow-down" />
             </span>
           </van-col>
@@ -138,7 +138,7 @@ export default {
     },
     // 年度
     timeConfirm(date) {
-      this.time = this.filterTime(date)
+      this.year = this.filterTime(date)
       this.timeCode = date.getFullYear()
       this.showTime = false
       this.getList()

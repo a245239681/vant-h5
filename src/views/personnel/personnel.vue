@@ -21,7 +21,7 @@
         is-link
         :title="item.title"
         :icon="item.icon"
-        :url="item.url"
+        @click="go(item)"
       />
     </div>
   </div>
@@ -42,7 +42,7 @@ export default {
         {
           title: '电子证书查询',
           icon: require('@/assets/images/n4.png'),
-          url: 'https://gxrswx.healthan.net/home/select_zs',
+          url: '/dianzi',
         },
         {
           title: '(区直)人事档案存放地查询',
@@ -69,6 +69,11 @@ export default {
     // })
   },
   methods: {
+    go(item) {
+      item.title !== '电子证书查询'
+        ? (window.location.href = item.url)
+        : this.$router.push(item.url)
+    },
     /**
      * 获取-外部接口信息
      */
