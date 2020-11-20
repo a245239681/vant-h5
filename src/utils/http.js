@@ -33,11 +33,11 @@ function ajaxPost(url, params, callfunc, async) {
       Toast('系统异常,请重试!')
     })
 }
-function postRequest(url, params) {
+function postRequest(url, params, msg = '加载中') {
   return new Promise((resolve, reject) => {
     let userToken = getToken() || ''
     const loadings = Toast.loading({
-      message: '加载中...',
+      message: msg + '...',
       forbidClick: true,
       duration: 0,
     })

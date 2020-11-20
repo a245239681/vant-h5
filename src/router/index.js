@@ -391,6 +391,14 @@ const routes = [
     },
   },
   {
+    path: '/toExamineTest',
+    name: 'ToExamineTest',
+    component: () => import('../views/progress/toExamineTest.vue'),
+    meta: {
+      title: '提交成功',
+    },
+  },
+  {
     path: '/resident',
     name: 'Resident',
     component: () => import('../views/resident/from.vue'),
@@ -452,6 +460,14 @@ const routes = [
     component: () => import('../views/shebao/notice.vue'),
     meta: {
       title: '缴费业务',
+    },
+  },
+  {
+    path: '/redundancy',
+    name: 'Redundancy',
+    component: () => import('../views/handle-business/redundancy.vue'),
+    meta: {
+      title: '申请职业技能提升补贴',
     },
   },
 ]
