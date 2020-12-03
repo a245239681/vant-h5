@@ -134,8 +134,8 @@ export default {
             },
             {
               name: '缴费信息查询',
-              // url: '/prove',
-              url: '/up',
+              url: '/prove',
+              // url: '/up',
             },
             {
               name: '参保信息查询',

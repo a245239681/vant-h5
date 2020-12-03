@@ -19,6 +19,12 @@
           <van-col span="16" class="input-list">{{ info.create_time }}</van-col>
         </van-row>
         <van-row class="info-text">
+          <van-col span="8" class="lable-title">办理意见</van-col>
+          <van-col span="16" class="input-list">{{
+            info.matter_opinion
+          }}</van-col>
+        </van-row>
+        <van-row class="info-text">
           <van-col span="8" class="lable-title">办理状态</van-col>
           <van-col span="16" class="input-list">
             <span class="in-y" v-show="info.acpt_status_code === '0'">{{
@@ -60,9 +66,9 @@
       >
         <van-step v-for="(items, i) in item.points" :key="i">
           <h3>{{ items.point_name }}</h3>
-          <p v-show="items.point_user !== undefined">
+          <!-- <p v-show="items.point_user !== undefined">
             经办人：{{ items.point_user }}
-          </p>
+          </p> -->
           <p>处理结果：{{ items.point_result }}</p>
           <p v-show="items.point_time !== undefined">
             处理时间：{{ items.point_time }}

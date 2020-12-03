@@ -90,6 +90,7 @@ function upLoaderImg(url, params) {
       })
       .catch(err => {
         reject(err)
+        console.log(123)
         loadings.clear()
       })
   })

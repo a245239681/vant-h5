@@ -602,6 +602,7 @@ export default {
       communityCode: '', // 社区
       gradeCode: '', // 缴费档次代码
       cab139: '', // 参保地代码
+      aaf019: '',
       auto: require('@/assets/images/icon/autograph.png'),
       fileList: [
         {
@@ -1020,6 +1021,7 @@ export default {
       )
       if (data.code === 0) {
         this.cab139 = data.data.cab139
+        this.aaf019 = data.data.aaf019
         return data.data.apply_flag
       }
       if (data.code === 2000 || data.code === 3000) {
@@ -1229,6 +1231,7 @@ export default {
         caz289_170: this.gradeCode, // 缴费档次
         aae005: this.info.aae005, // 电话
         cab139: this.cab139,
+        aaf019: this.aaf019,
         aac058: this.HkCode,
         file_list: filelist,
       }

@@ -118,7 +118,7 @@
               <van-uploader
                 v-model="item.file"
                 multiple
-                :max-count="1"
+                :max-count="2"
                 :name="inx"
                 :after-read="afterRead"
                 :before-delete="delImg"
@@ -160,7 +160,7 @@
       title="添加证书"
       show-cancel-button
     >
-      <van-form ref="myform" class="p30">
+      <van-form ref="myform" class="p30 myform">
         <van-row>
           <van-col span="24" class="add-title-lable just-start"
             >证书获取日期</van-col
@@ -387,31 +387,38 @@ export default {
       params.append('yab139', that.mechanism.value)
       params.append('file_type', 'IMAGE')
       let res = await that.upLoader(params) //使用上传的方法。file.file
-      if (res.code === 0) {
+      if (res?.code === 0) {
         that.fileList[sub].doc.push({
           fileid: res.data.fileid,
           filename: res.data.filename,
           yab003: that.cab139,
         })
       }
-      if (res.code === 3001) {
+      if (res?.code === 3001) {
         file.status = 'failed'
         file.message = '上传失败'
         that.$toast.fail(res.msg)
+      }
+      if (!res) {
+        file.status = 'failed'
+        file.message = '上传失败'
       }
     },
     // api/gxrswx/Basedata/updateFileTest 上传测试接口
     // /api/gxrswx/Basedata/updateFile 正式接口
     async upLoader(params) {
-      let { data } = await this.$http.upLoaderImg(
-        '/api/gxrswx/Basedata/updateFileTest',
-        params
-      )
-
-      if (data.code === 0) {
-        this.$toast('上传成功')
-      }
-      return data
+      return await this.$http
+        .upLoaderImg('/api/gxrswx/Basedata/updateFileTest', params)
+        .then(res => {
+          if (res.data.code === 0) {
+            this.$toast('上传成功')
+            return res.data
+          }
+          return new Promise()
+        })
+        .catch(res => {
+          console.log(res)
+        })
     },
     // 点击删除图片
     delImg(file, name) {
@@ -496,6 +503,9 @@ export default {
       let that = this
       // 证书
       let skill_cert = this.certificateArr
+      if (skill_cert.length === 0) {
+        that.$toast('请添加证书')
+      }
       console.log(skill_cert)
       // 附件处理
       const filelist = this.fileList.map(v => ({
@@ -507,8 +517,8 @@ export default {
       }))
       let fild = false
       try {
-        filelist.forEach(function(item, index) {
-          if (item.doc.length === 0 && index !== 2) {
+        filelist.forEach(function(item) {
+          if (item.doc.length === 0) {
             fild = true
           }
         })
@@ -659,5 +669,8 @@ export default {
   font-size: 32px;
   height: 100px;
   line-height: 100px;
+}
+.redundancy .van-field__error-message {
+  display: none;
 }
 </style>

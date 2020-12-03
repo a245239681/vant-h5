@@ -164,7 +164,7 @@ export default {
       let MM = date.getMonth() + 1 // 月
       MM = MM < 10 ? '0' + MM : MM
 
-      return y + MM
+      return y.toString() + MM
     },
     // 格式化时间选择格式
     formatter(type, val) {

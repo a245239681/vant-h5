@@ -470,6 +470,14 @@ const routes = [
       title: '申请职业技能提升补贴',
     },
   },
+  {
+    path: '/logout-residents',
+    name: 'LogoutResidents',
+    component: () => import('../views/shebao/logout-residents.vue'),
+    meta: {
+      title: '居民养老注销登记',
+    },
+  },
 ]
 
 const router = new VueRouter({

@@ -123,13 +123,13 @@ export default {
      */
     logout() {
       let that = this
-      that.$dialog
-        .confirm({
-          title: '',
-          message: '是否确认挂失社保卡号为' + that.info.card + '的社保卡',
-        })
-        .then(() => {
-          if (that.info.status_code === '1') {
+      if (that.info.status_code === '1') {
+        that.$dialog
+          .confirm({
+            title: '',
+            message: '是否确认挂失社保卡号为' + that.info.card + '的社保卡',
+          })
+          .then(() => {
             that.$http.postJson(
               '/api/gxrswx/Card/cardTemporalLoss',
               {},
@@ -147,7 +147,16 @@ export default {
                 }
               }
             )
-          } else if (that.info.status_code === '2') {
+          })
+          .catch(() => {})
+      }
+      if (that.info.status_code === '2') {
+        that.$dialog
+          .confirm({
+            title: '',
+            message: '是否确认解挂社保卡号为' + that.info.card + '的社保卡',
+          })
+          .then(() => {
             that.$http.postJson(
               '/api/gxrswx/Card/cardTemporalUnloss',
               {},
@@ -165,9 +174,8 @@ export default {
                 }
               }
             )
-          }
-        })
-        .catch(() => {})
+          })
+      }
     },
   },
 }

@@ -61,7 +61,7 @@
                 <van-row class="h40">
                   <van-col span="8" class="f-grey">转出单位名称</van-col>
                   <van-col span="16" class="f-black"
-                    >{{ item.aab301 }}
+                    >{{ item.aab299 }}
                   </van-col>
                 </van-row>
               </van-col>
