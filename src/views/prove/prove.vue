@@ -87,6 +87,7 @@
         <van-button
           native-type="submit"
           class="button-large"
+          :disabled="isDisable"
           color="#287DE2"
           size="large"
           >提交</van-button
@@ -119,6 +120,7 @@ export default {
       minDate: new Date(1997, 0, 1), // 最小时间
       maxDate: new Date(2025, 10, 1), // 最大时间
       currentDate: this.getPreMonth(this.getNowFormatDate()), // 默认选中时间
+      isDisable: false,
     }
   },
   created() {
@@ -164,7 +166,7 @@ export default {
       let MM = date.getMonth() + 1 // 月
       MM = MM < 10 ? '0' + MM : MM
 
-      return y.toString() + MM
+      return y + '' + MM
     },
     // 格式化时间选择格式
     formatter(type, val) {
@@ -196,7 +198,11 @@ export default {
               : ''
             _this.$token.setToken('address', JSON.stringify(_this.mechanismArr))
             _this.loading = false
-          } else if (res.data.code === 1001 || res.data.code === 1002) {
+          } else if (
+            (res.data.code === 1001 || res.data.code === 1002) &&
+            _this.$store.state.type === 1
+          ) {
+            _this.$store.commit('token', 2)
             localStorage.removeItem('XX-Token')
             localStorage.removeItem('address')
             _this.$token.getToken().then(res => {
@@ -205,7 +211,8 @@ export default {
               }
             })
           } else if (res.data.code === 1004 || res.data.code === 3000) {
-            this.$dialog.alert({
+            _this.isDisable = true
+            _this.$dialog.alert({
               message: res.data.msg,
             })
           } else {

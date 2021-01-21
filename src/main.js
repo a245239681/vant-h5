@@ -8,6 +8,7 @@ import './assets/css/reset.css'
 import './assets/css/border.css'
 import routers from '@/utils/routers'
 import apiAjax from '@/utils/http'
+import common from './assets/js/common'
 import VueSignature from 'vue-signature-simple'
 import vueEsign from 'vue-esign'
 import {
@@ -100,6 +101,7 @@ Vue.use(Button)
 Vue.config.productionTip = false
 Vue.prototype.$token = routers
 Vue.prototype.$http = apiAjax
+Vue.prototype.$common = common
 
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {

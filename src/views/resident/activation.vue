@@ -114,11 +114,11 @@ export default {
         // {
 
         // }
-        // 大于2MB 、img宽高 > 960 则进行压缩
-        if (!isLt2MB || imgWidth >= 960 || imgHeight >= 960) {
+        // 大于2MB 、img宽高 > 800 则进行压缩
+        if (!isLt2MB || imgWidth >= 800 || imgHeight >= 800) {
           // 最大尺寸
-          let maxWidth = 850
-          let maxHeight = 850
+          let maxWidth = 800
+          let maxHeight = 800
           // 图片尺寸超过 960 X 960 的限制
           if (imgWidth > maxWidth || imgHeight > maxHeight) {
             if (imgWidth / imgHeight > maxWidth / maxHeight) {
@@ -168,7 +168,7 @@ export default {
               break
           }
         }
-        await _this.onGit(img.src)
+        await _this.onGit(canvas.toDataURL('image/jpeg', 1))
       }
     },
 

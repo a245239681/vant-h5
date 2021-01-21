@@ -224,6 +224,9 @@
         <p class="tips">EMS邮寄</p>
         <div class="tipEMS">
           <p class="title">温馨提示</p>
+          <p class="y-p">
+            根据疫区防控要求。目前石家庄、邢台地区暂时不支持邮寄。
+          </p>
           <p class="de">
             选择EMS邮寄方式领卡，则社保卡统一由EMS寄送参保人，邮费区外22元，区内16元，由参保人个人承担运费。
           </p>
@@ -1674,6 +1677,13 @@ export default {
   color: #666666;
   padding: 20px 30px 30px 30px;
   background-color: #fff;
+}
+.tipEMS .y-p {
+  line-height: 40px;
+  font-size: 24px;
+  padding: 20px 30px 0 30px;
+  background-color: #fff;
+  color: #ff1433;
 }
 .bank-btn {
   background-color: #fff;

@@ -478,6 +478,54 @@ const routes = [
       title: '居民养老注销登记',
     },
   },
+  {
+    path: '/treatment-apply',
+    name: 'TreatmentApply',
+    component: () => import('../views/shebao/treatment-apply.vue'),
+    meta: {
+      title: '人员领取待遇申请',
+    },
+  },
+  {
+    path: '/transfer-province',
+    name: 'transferProvince',
+    component: () => import('../views/transfer/transfer-province.vue'),
+    meta: {
+      title: '省内城镇职工基本养老保险转移接续申请',
+    },
+  },
+  {
+    path: '/modifyInfo',
+    name: 'ModifyInfo',
+    component: () => import('../views/info/modifyInfo.vue'),
+    meta: {
+      title: '个人基本信息修改',
+    },
+  },
+  {
+    path: '/my',
+    name: 'My',
+    component: () => import('../views/my/index.vue'),
+    meta: {
+      title: '个人中心',
+    },
+  },
+  {
+    path: '/ems',
+    name: 'Ems',
+    component: () => import('../views/my/ems.vue'),
+    meta: {
+      title: '业务列表',
+    },
+  },
+  {
+    path: '/emsDetails',
+    name: 'EMSdetails',
+    component: () => import('../views/my/EMSdetails.vue'),
+    meta: {
+      title: '业务详情',
+    },
+  },
 ]
 
 const router = new VueRouter({

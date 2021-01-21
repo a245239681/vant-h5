@@ -2,13 +2,13 @@
 import axios from 'axios'
 // import router from '../router'
 import qs from 'qs'
-
+import store from '../store'
 var code = ''
 const userToken = 'XX-Token'
-async function getToken() {
+async function getToken(index) {
   let token = localStorage.getItem(userToken)
   if (token === 'undefined' || token === null || token === '') {
-    return getCode('')
+    return getCode(index)
   }
   return token
 }
@@ -20,14 +20,15 @@ function setItem(key, value) {
 /**
  * 非静默授权，第一次有弹框
  */
-function getCode(o) {
+function getCode(index = '') {
   // 非静默授权，第一次有弹框
   code = ''
   let local = window.location.href // 获取页面url
   local = local.split('//')
   // console.log(local[1])
   code = getUrlCode().code // 截取code
-  if (o === '-1') {
+  console.log(123)
+  if (index === '-1') {
     code = ''
     local[1] = window.location.host
   }
@@ -41,7 +42,7 @@ function getCode(o) {
     /**
      * 获取Token
      */
-    return getTokens()
+    return getTokens(index)
   }
 }
 
@@ -62,7 +63,7 @@ function getUrlCode() {
   return theRequest
 }
 
-async function getTokens() {
+async function getTokens(index) {
   // let token = localStorage.getItem('Zp-Token') || ''
   let data = qs.stringify({
     code: code,
@@ -79,12 +80,13 @@ async function getTokens() {
     },
   })
     .then(res => {
+      store.commit('getcode', code)
       if (res.data.code === 0) {
         setItem('XX-Token', res.data.data.token)
         // console.log(res)
         isSuccess = true
       }
-      if (res.data.code === 1005) {
+      if (res.data.code === 1005 && index !== 1) {
         location.href = res.data.data.url
       }
     })

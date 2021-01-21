@@ -30,18 +30,23 @@
       <van-field
         input-align="right"
         label="发放账号"
-        readonly
+        required
         placeholder="请填写发放账号"
         name="zhanghao"
         v-model="zhanghao"
+        :rules="[{ required: true, message: '请填写发放账号' }]"
       />
       <van-field
         input-align="right"
         label="金融机构"
         readonly
+        required
+        is-link
         placeholder="请填写金融机构"
         name="jigou"
-        v-model="jigou"
+        @click="onchangeBank"
+        v-model="jigou.text"
+        :rules="[{ required: true, message: '请选择金融机构' }]"
       />
       <van-field
         required
@@ -264,6 +269,15 @@
         @confirm="onRank"
       />
     </van-popup>
+    <!-- 银行选择 -->
+    <van-popup v-model="showBank" position="bottom">
+      <van-picker
+        show-toolbar
+        :columns="bankArr"
+        @cancel="showBank = false"
+        @confirm="onBank"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -274,7 +288,7 @@ export default {
       bianhao: '',
       name: '',
       zhanghao: '',
-      jigou: '',
+      jigou: { text: '', code: '' },
       iphone: '',
       address: '',
       // 参保地数据
@@ -284,10 +298,15 @@ export default {
       showCertificate: false,
       showTime: false,
       showRank: false,
+      showBank: false,
       minDate: new Date(1949, 0, 1), // 最小时间
       maxDate: new Date(), // 最大时间
       currentDate: new Date(), // 默认选中时间
       bankNumer: '', // 银行编号
+      /**银行编号是否可编辑 */
+      isBankCheck: false,
+      /**银行机构是否可编辑 */
+      isCheck: false,
       // 证书表单
       certificateObj: {
         aja010: '',
@@ -316,6 +335,7 @@ export default {
         },
       ],
       certificateArr: [],
+      bankArr: [],
     }
   },
   created() {},
@@ -324,57 +344,134 @@ export default {
       if (res) {
         let res = await this.getAddress()
         if (res === 0) {
-          this.getBankCardInfo()
+          let code = await this.getBankCardInfo()
+          if (code === 0) {
+            await this.getBankList()
+          }
         }
       }
     })
   },
   methods: {
     // 参保地选择
-    onConfirm(value) {
+    async onConfirm(value) {
       this.mechanism = value
       this.showMechanism = false
-      this.getBankCardInfo()
+      let code = await this.getBankCardInfo()
+      if (code === 0) {
+        await this.getBankList()
+      }
     },
     /**获取参保地 */
     async getAddress() {
       let _this = this
-      let { data } = await _this.$http.postRequest(
-        '/api/gxrswx/Personal/addrList',
-        {}
-      )
+      try {
+        let { data } = await _this.$http.postRequest(
+          '/api/gxrswx/Personal/addrList',
+          {}
+        )
 
-      if (data.code === 0) {
-        _this.mechanismArr = data.data.list.map(v => {
-          return {
-            text: v.name,
-            value: v.code,
-          }
-        })
-        _this.mechanismArr.length !== 0
-          ? (_this.mechanism = _this.mechanismArr[0])
-          : ''
-        _this.$token.setToken('address', JSON.stringify(_this.mechanismArr))
+        if (data.code === 0) {
+          _this.mechanismArr = data.data.list.map(v => {
+            return {
+              text: v.name,
+              value: v.code,
+            }
+          })
+          _this.mechanismArr.length !== 0
+            ? (_this.mechanism = _this.mechanismArr[0])
+            : ''
+          _this.$token.setToken('address', JSON.stringify(_this.mechanismArr))
+        } else if (
+          (data.code === 1002 || data.code === 1001) &&
+          _this.$store.state.type === 1
+        ) {
+          _this.$store.commit('token', 2)
+          localStorage.removeItem('XX-Token')
+          _this.$token.getToken().then(async res => {
+            if (res) {
+              let res = await _this.getAddress()
+              if (res === 0) {
+                let code = await _this.getBankCardInfo()
+                if (code === 0) {
+                  await _this.getBankList()
+                }
+              }
+            }
+          })
+        } else {
+          _this.$dialog({ message: data.msg })
+        }
+        return data.code
+      } catch (err) {
+        _this.$dialog({ message: '获取参保地失败' })
+        console.log(err)
       }
-      return data.code
     },
     /**获取社保卡金融信息 */
     async getBankCardInfo() {
       let _this = this
-      let {
-        data,
-      } = await _this.$http.postRequest(
-        '/api/gxrswx/Socialapply/getBankCardInfo',
-        { yab139: _this.mechanism.value }
-      )
-      if (data.code === 0) {
-        console.log(data.data)
-        _this.name = data.data.aac003
-        _this.bianhao = data.data.aac001
-        _this.zhanghao = data.data.aae010
-        _this.jigou = data.data.baz838_desc
-        _this.bankNumer = data.data.baz838
+      try {
+        let {
+          data,
+        } = await _this.$http.postRequest(
+          '/api/gxrswx/Socialapply/getBankCardInfo',
+          { yab139: _this.mechanism.value }
+        )
+        if (data.code === 0) {
+          // console.log(data.data)
+          _this.name = data.data.aac003
+          _this.bianhao = data.data.aac001
+          _this.zhanghao = data.data.aae010
+          _this.bankNumer = data.data.baz838
+          if (_this.zhanghao !== '') {
+            _this.jigou.text = data.data.baz838_desc
+            _this.jigou.code = data.data.baz838
+            _this.isCheck = true
+            _this.isBankCheck = true
+          }
+          return data.code
+        } else {
+          _this.$dialog({ message: data.msg })
+        }
+      } catch (e) {
+        _this.$dialog({ message: '获取社保卡金融信息失败' })
+        console.error(e)
       }
+    },
+    /**银行列表 */
+    async getBankList() {
+      let that = this
+      try {
+        let { data } = await that.$http.postRequest(
+          '/api/gxrswx/Basedata/getBankList',
+          {
+            yab139: that.mechanism.value,
+            aae140: '210',
+          }
+        )
+        if (data.code === 0) {
+          that.bankArr = data.data.list.map(v => ({
+            text: v.name,
+            code: v.code,
+          }))
+        } else {
+          that.$toast({ message: data.msg })
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    /**银行 */
+    onchangeBank() {
+      if (this.isBankCheck) {
+        return
+      }
+      this.showBank = true
+    },
+    onBank(v) {
+      this.jigou = v
+      this.showBank = false
     },
     /**
      * 上传
@@ -500,6 +597,7 @@ export default {
     },
     /**职业技能替补申请提交 */
     async onSubmit(values) {
+      console.log(this.jigou)
       let that = this
       // 证书
       let skill_cert = this.certificateArr
@@ -533,7 +631,7 @@ export default {
         yab139: that.mechanism.value, // 参保地
         aae010: values.zhanghao, // 银行卡号
         aae006: values.address, // 地址
-        baz838: that.bankNumer, // 银行编号
+        baz838: that.jigou.code, // 银行编号
         aae131: values.iphone, // 联系电话
         fileList: filelist, // 附件
         skill_cert: skill_cert, // 证书

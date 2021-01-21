@@ -40,7 +40,7 @@
             required
             readonly
             label="性别"
-            placeholder="请选择性别"
+            placeholder="性别"
             name="aac004"
             v-model="info.aac004"
           />
@@ -49,7 +49,7 @@
             required
             input-align="right"
             label="出生日期"
-            placeholder="请选择出生日期"
+            placeholder="出生日期"
             name="aac006"
             v-model="info.aac006"
           />
@@ -277,6 +277,56 @@
         </div>
       </van-form>
     </div>
+    <div v-if="isSign">
+      <van-image
+        @click="showImg = true"
+        class="img-responsive"
+        :src="tableImg"
+      />
+
+      <div class="deployBtn" v-if="resultImg === ''">
+        <div class="next-btn">
+          <van-button
+            class="button-large"
+            @click="showSign = true"
+            color="#4186fb"
+            size="large"
+            >开始签名</van-button
+          >
+        </div>
+        <div class="prev-btn">
+          <van-button
+            plain
+            @click="downSign"
+            class="button-large b-color"
+            color="#333"
+            size="large"
+            >上一步</van-button
+          >
+        </div>
+      </div>
+      <div class="deployBtn" v-if="resultImg !== ''">
+        <div class="next-btn">
+          <van-button
+            class="button-large"
+            @click="getTable"
+            color="#4186fb"
+            size="large"
+            >上传登记表</van-button
+          >
+        </div>
+        <div class="prev-btn">
+          <van-button
+            plain
+            @click="showSign = true"
+            class="button-large b-color"
+            color="#333"
+            size="large"
+            >重新签名</van-button
+          >
+        </div>
+      </div>
+    </div>
     <!-- 生日 -->
     <van-popup v-model="showTime" position="bottom">
       <van-datetime-picker
@@ -324,7 +374,7 @@
         @confirm="onRelationship"
       />
     </van-popup>
-    <!-- 领取人关系 -->
+    <!-- 银行类别 -->
     <van-popup v-model="showBank" position="bottom">
       <van-picker
         show-toolbar
@@ -333,10 +383,47 @@
         @confirm="onBank"
       />
     </van-popup>
+    <!-- 签名 -->
+    <van-popup v-model="showSign" position="bottom">
+      <div class="van-picker__toolbar">
+        <button
+          type="button"
+          class="van-picker__cancel"
+          @click="showSign = false"
+        >
+          取消</button
+        ><button
+          type="button"
+          class="van-picker__confirm"
+          @click="handleGenerate"
+        >
+          确认
+        </button>
+      </div>
+      <h3 class="title-sign">请用手指在虚线中绘制签名</h3>
+      <div class="sign-box">
+        <vue-esign
+          class="border-sign"
+          ref="esign"
+          :width="400"
+          :height="200"
+          :isCrop="isCrop"
+          :lineWidth="lineWidth"
+          :lineColor="lineColor"
+          :bgColor.sync="bgColor"
+        />
+        <div class="buttom-b just-list">
+          <van-button plain type="default" @click="handleReset" class="mr20"
+            >重新签名</van-button
+          >
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
 <script>
+import EXIF from 'exif-js'
 export default {
   data() {
     return {
@@ -356,6 +443,7 @@ export default {
         relationship: '', // 领取人关系
         receiveName: '', // 领取人姓名
         receiveIdcard: '',
+        time: '',
       },
       cab139: '',
       showTime: false,
@@ -369,6 +457,18 @@ export default {
       currentDate: new Date(2000, 10, 1), // 默认选中时间
       isSign: false, // 是否显示签名
       signImg: '', // 签名后的图片
+      showSign: false, // 显示签名
+      showImg: false, // 预览表格
+      tableImg: '', // 生成表格图片
+      // 签名属性设置
+      lineWidth: 3,
+      lineColor: '#000000',
+      bgColor: '',
+      resultImg: '', // 签名
+      isCrop: false,
+      index: 0,
+      images: [],
+      zoomImg: '', // 缩放后的签名
       auto: require('@/assets/images/icon/autograph.png'), // 默认签名图标
       active: 0, // 步骤
       isDisable: false, // 是否禁用提交/下一步
@@ -381,6 +481,10 @@ export default {
       modeCode: '',
       relationshipCode: '',
       bankCode: '',
+      // 身份证验证
+      matchIDCard: /^([1-6][1-9]|50)\d{4}(18|19|20)\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
+      // 手机号验证
+      reg: /^[1][3,4,5,6,7,8,9][0-9]{9}$/,
       /**终止原因 */
       reasonArr: [
         {
@@ -574,18 +678,19 @@ export default {
           value: '403',
         },
       ],
+
       /**附件 */
       fileList: [
         {
           doc_name: '《城乡居民基本养老保险注销登记表》',
-          doc_code: 'D11976',
+          doc_code: 'D11988',
           scan_num: '1',
           bz: '',
           doc: [],
         },
         {
-          doc_name: '本人身份证件(正反面)',
-          doc_code: 'D11977',
+          doc_name: '申请人有效身份证件',
+          doc_code: 'D11989',
           scan_num: '1',
           bz: '',
           doc: [],
@@ -614,6 +719,78 @@ export default {
   methods: {
     /**下一步 */
     async next() {
+      if (this.active === 0) {
+        if (this.info.username === '') {
+          this.$toast('姓名不能为空')
+          return
+        }
+        if (this.info.aac002 === '') {
+          this.$toast('身份证不能为空')
+          return
+        }
+        if (this.info.aac004 === '') {
+          this.$toast('性别不能为空')
+          return
+        }
+        if (this.info.aac006 === '') {
+          this.$toast('出生日期不能为空')
+          return
+        }
+        if (this.info.bianhao.value === '') {
+          this.$toast('个人编号不能为空')
+          return
+        }
+        if (this.info.resident === '') {
+          this.$toast('户口性质不能为空')
+          return
+        }
+        if (this.info.community === '') {
+          this.$toast('社区不能为空')
+          return
+        }
+        if (this.info.reason === '') {
+          this.$toast('终止原因不能为空')
+          return
+        }
+        if (this.info.time === '') {
+          this.$toast('终止日期不能为空')
+          return
+        }
+      }
+      if (this.active === 1) {
+        if (this.info.mode === '') {
+          this.$toast('请选择发放方式')
+          return
+        }
+        if (this.bankCode === '') {
+          this.$toast('请选择银行类别')
+          return
+        }
+        if (this.info.bankName === '') {
+          this.$toast('请填写银行户名')
+          return
+        }
+        if (this.info.bankNum === '') {
+          this.$toast('请填写银行账号')
+          return
+        }
+        if (this.info.relationship === '') {
+          this.$toast('请选择领取人关系')
+          return
+        }
+        if (this.info.receiveName === '') {
+          this.$toast('请填写领取人姓名')
+          return
+        }
+        if (this.info.receiveIdcard === '') {
+          this.$toast('请填写领取人身份证')
+          return
+        }
+        if (!this.matchIDCard.test(this.info.receiveIdcard)) {
+          this.$toast.fail('身份证号码格式不正确')
+          return
+        }
+      }
       ++this.active
       this.active > 2 ? (this.active = 2) : this.active
     },
@@ -638,6 +815,27 @@ export default {
           _this.perNumerArr.length !== 0
             ? (_this.info.bianhao = _this.perNumerArr[0])
             : ''
+        } else if (
+          (data.code === 1002 || data.code === 1001) &&
+          _this.$store.state.type === 1
+        ) {
+          _this.$store.commit('token', 2)
+          localStorage.removeItem('XX-Token')
+          this.$token.getToken().then(async res => {
+            if (res) {
+              let res = await this.getNumberList()
+              if (res === 0) {
+                let user = await this.getuser()
+                if (user === 0) {
+                  let account = await this.account()
+                  // state 0不可以注销 1可以注销
+                  if (account.state === '0') {
+                    this.$dialog({ message: account.remark })
+                  }
+                }
+              }
+            }
+          })
         } else {
           _this.$dialog({ message: data.msg })
         }
@@ -692,6 +890,7 @@ export default {
     onPerNumer(v) {
       this.info.bianhao = v
       this.showPerNumer = false
+      this.getuser()
     },
     // 格式化时间选择格式
     formatter(date) {
@@ -750,8 +949,7 @@ export default {
           filename: res.data.filename,
           yab003: that.cab139,
         })
-      }
-      if (res.code === 3001) {
+      } else {
         file.status = 'failed'
         file.message = '上传失败'
         that.$toast.fail(res.msg)
@@ -780,13 +978,227 @@ export default {
       }
       return data
     },
-    /**签名 */
-    async goSign(img) {
-      console.log(img)
+    /**城乡居民基本养老保险注销登记表 签名 */
+    async goSign(imgs) {
+      let _this = this
+      // if (imgs) {
+      //   imgs = await _this.compressImage(_this.base64toFile(imgs))
+      // }
+      // console.log(imgs)
+      let modal = {
+        aab069_af02: _this.info.community,
+        aac003: _this.info.username,
+        aac002: _this.info.aac002,
+        aae160: _this.reasonCode,
+        aae160_remark: _this.info.reason,
+        aae138: _this.info.time,
+        cae243: _this.info.receiveName,
+        cae245: _this.info.receiveIdcard,
+        aaf002: _this.info.bank,
+        aae010: _this.info.bankNum,
+        cae246: _this.info.relationship,
+        sign_png: imgs,
+      }
+      let { data } = await _this.$http.postRequest(
+        '/api/gxrswx/Imagemark/residentCloseAccount',
+        modal
+      )
+      if (data.code === 0) {
+        // 显示签名结果
+        _this.tableImg = 'data:image/png;base64,' + data.data.jpeg
+        _this.images = []
+        _this.images.push(_this.tableImg)
+        imgs
+          ? ((_this.showSign = false), (_this.signImg = _this.tableImg))
+          : ((_this.isSign = true),
+            (_this.signImg = ''),
+            (_this.resultImg = ''))
+      }
+    },
+    // 关闭签名
+    downSign() {
+      this.isSign = false
+    },
+    // 清空签名画布
+    handleReset() {
+      this.$refs.esign.reset()
+    },
+    // 生成签名
+    handleGenerate() {
+      this.$refs.esign
+        .generate()
+        .then(res => {
+          this.goSign(res)
+          this.resultImg = res
+          // console.log(this.resultImg)
+        })
+        .catch(() => {
+          this.$toast('请进行签名') // 画布没有签字时会执行这里 'Not Signned'
+        })
+    },
+    // 上传登记表
+    async getTable() {
+      let that = this
+      let file = that.base64toFile(that.tableImg)
+      console.log(file)
+      let params = new FormData()
+      params.append('file', file)
+      params.append('yab139', that.cab139)
+      params.append('file_type', 'IMAGE')
+      let res = await that.upLoader(params)
+      console.log(res)
+      if (res.code === 0) {
+        that.isSign = false
+        that.fileList[0].doc = []
+        that.fileList[0].doc.push({
+          fileid: res.data.fileid,
+          filename: res.data.filename,
+          yab003: that.cab139,
+        })
+      }
+    },
+    // 压缩图片 and 旋转角度纠正
+    async compressImage(im) {
+      // let _this = this
+      let file = im
+      let fileReader = new FileReader()
+      let img = new Image()
+      let imgWidth = ''
+      let imgHeight = ''
+      // 旋转角度
+      let Orientation = null
+      // 缩放图片需要的canvas
+      let canvas = document.createElement('canvas')
+      let ctx = canvas.getContext('2d') // 图片大小  大于2MB 则压缩
+      const isLt2MB = file.size < 2097152
+      // 通过 EXIF 获取旋转角度 1 为正常  3 为 180°  6 顺时针90°  9 为 逆时针90°
+      EXIF.getData(file, function() {
+        EXIF.getAllTags(this)
+        Orientation = EXIF.getTag(this, 'Orientation')
+      })
+      // 文件读取 成功执行
+      fileReader.onload = function(ev) {
+        // 文件base64化，以便获知图片原始尺寸
+        img.src = ev.target.result
+      }
+      // 读取文件
+      fileReader.readAsDataURL(file)
+      // base64地址图片加载完毕后
+      return new Promise(resolve => {
+        img.onload = function() {
+          imgWidth = img.width
+          imgHeight = img.height
+          canvas.width = img.width
+          canvas.height = img.height
+          // 目标尺寸
+          let targetWidth = imgWidth
+          let targetHeight = imgHeight
+          // 大于2MB 、img宽高 > 90*40 则进行压缩
+          if (!isLt2MB || imgWidth >= 90 || imgHeight >= 40) {
+            // 最大尺寸
+            let maxWidth = 90
+            let maxHeight = 40
+            if (imgWidth > maxWidth || imgHeight > maxHeight) {
+              if (imgWidth / imgHeight > maxWidth / maxHeight) {
+                // 更宽，按照宽度限定尺寸
+                targetWidth = maxWidth
+                targetHeight = Math.round(maxWidth * (imgHeight / imgWidth))
+              } else {
+                targetHeight = maxHeight
+                targetWidth = Math.round(maxHeight * (imgWidth / imgHeight))
+              }
+            }
+            // canvas对图片进行缩放
+            canvas.width = targetWidth
+            canvas.height = targetHeight
+            // 图片大小超过 2Mb 但未旋转  则只需要进行图片压缩
+            if (!Orientation || +Orientation === 1) {
+              ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+            }
+          }
+          // 拍照旋转 需矫正图片
+          if (Orientation && +Orientation !== 1) {
+            switch (+Orientation) {
+              case 6: // 旋转90度
+                canvas.width = targetHeight
+                canvas.height = targetWidth
+                ctx.rotate(Math.PI / 2)
+                // 图片渲染
+                ctx.drawImage(img, 0, -targetHeight, targetWidth, targetHeight)
+                break
+              case 3: // 旋转180度
+                ctx.rotate(Math.PI)
+                // 图片渲染
+                ctx.drawImage(
+                  img,
+                  -targetWidth,
+                  -targetHeight,
+                  targetWidth,
+                  targetHeight
+                )
+                break
+              case 8: // 旋转-90度
+                canvas.width = targetHeight
+                canvas.height = targetWidth
+                ctx.rotate((3 * Math.PI) / 2)
+                // 图片渲染
+                ctx.drawImage(img, -targetWidth, 0, targetWidth, targetHeight)
+                break
+            }
+          }
+          let data = canvas.toDataURL('image/jpeg', 1)
+          resolve(data)
+        }
+      })
+    },
+    base64toFile(dataurl, filename = 'file') {
+      let arr = dataurl.split(',')
+
+      let mime = arr[0].match(/:(.*?);/)[1]
+
+      let suffix = mime.split('/')[1]
+
+      let bstr = atob(arr[1])
+
+      let n = bstr.length
+
+      let u8arr = new Uint8Array(n)
+
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n)
+      }
+
+      return new File([u8arr], `${filename}.${suffix}`, {
+        type: mime,
+      })
+    },
+    onChange(index) {
+      this.index = index
     },
     /**提交数据 */
-    async onSubmit(values) {
+    async onSubmit() {
       let that = this
+      const filelist = this.fileList.map(v => ({
+        doc_name: v.doc_name,
+        doc_code: v.doc_code,
+        scan_num: v.scan_num,
+        bz: v.bz,
+        doc: v.doc,
+      }))
+      let fild = false
+      try {
+        filelist.forEach(function(item) {
+          if (item.doc.length === 0) {
+            fild = true
+          }
+        })
+      } catch (e) {
+        console.error(e)
+      }
+      if (fild) {
+        this.$toast('带*号为必传项，请检查')
+        return
+      }
       let modal = {
         /**发放方式 */
         aae145: that.modeCode,
@@ -795,36 +1207,51 @@ export default {
         /**终止原因 */
         aae160: that.reasonCode,
         /**户口类型 */
-        aac009: values.resident,
+        aac009: that.info.resident,
         /** 领取人关系*/
         cae246: that.relationshipCode,
         /**领取人证件号 */
-        cae245: values.receiveIdcard,
+        cae245: that.info.receiveIdcard,
         /**终止日期 */
-        aae138: values.time,
+        aae138: that.info.time,
         /**领取人姓名 */
-        cae243: values.receiveName,
+        cae243: that.info.receiveName,
         /**银行户名 */
-        aae009: values.bankName,
+        aae009: that.info.bankName,
         /** 经办机构*/
         cab139: that.cab139,
         /**银行账号 */
-        aae010: values.bankNum,
+        aae010: that.info.bankNum,
         /**个人编号 */
         aac001: that.info.bianhao.text,
+        file_list: filelist, // 附件
       }
       console.log(modal)
       try {
-        let { data } = await that.$http.postRequest(
-          '/api/gxrswx/Resident/closeAccountPost',
-          modal,
-          '正在提交...'
-        )
-        if (data.code === 0) {
-          that.$dialog({ message: '提交审核成功' })
-        } else {
-          that.$toast({ message: data.msg })
-        }
+        this.$dialog
+          .confirm({
+            title: '',
+            message: '是否确认注销居民参保登记',
+          })
+          .then(async () => {
+            let { data } = await that.$http.postRequest(
+              '/api/gxrswx/Resident/closeAccountPost',
+              modal,
+              '正在提交...'
+            )
+            if (data.code === 0) {
+              that.$router.push({
+                name: 'ToExamineTest',
+                query: {
+                  id: data.data.acpt_no,
+                  code: that.yab139,
+                },
+              })
+            } else {
+              that.$toast({ message: data.msg })
+            }
+          })
+          .catch(() => {})
       } catch (err) {
         that.$toast({ message: '提交失败,稍后请重试' })
         console.error(err)
@@ -961,5 +1388,11 @@ export default {
   line-height: 42px;
   color: #999999;
   text-align: center;
+}
+.mr20 {
+  margin-right: 20px;
+}
+.buttom-b {
+  margin-top: 20px;
 }
 </style>

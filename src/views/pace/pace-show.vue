@@ -23,6 +23,12 @@
           <van-col span="8" class="lable-title">卡管城市</van-col>
           <van-col span="16" class="input-list">{{ info.yab139 }}</van-col>
         </van-row>
+        <van-row class="info-text">
+          <van-col span="8" class="lable-title">服务网点</van-col>
+          <van-col span="16" class="input-list">{{
+            info.bank_node_name
+          }}</van-col>
+        </van-row>
         <van-row class="info-text" v-if="info.province_bitch !== undefined">
           <van-col span="8" class="lable-title">省级批次号</van-col>
           <van-col span="16" class="input-list">{{

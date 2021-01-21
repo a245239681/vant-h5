@@ -15,7 +15,7 @@
               <van-cell-group>
                 <van-cell>
                   <van-row>
-                    <van-col span="24">社保卡进度查询</van-col>
+                    <van-col span="24">基本信息</van-col>
                   </van-row>
                 </van-cell>
               </van-cell-group>
@@ -35,16 +35,15 @@
               placeholder="请填写身份证"
               name="aac002"
               v-model="info.aac002"
+              :rules="[{ validator, message: '请填写正确的身份证' }]"
             />
             <van-field
               input-align="right"
               required
               readonly
-              is-link
               label="性别"
-              placeholder="请选择性别"
+              placeholder="性别"
               name="aac004"
-              @click="showSex = true"
               v-model="info.aac004"
             />
             <van-field
@@ -52,9 +51,7 @@
               required
               input-align="right"
               label="出生日期"
-              placeholder="请选择出生日期"
-              is-link
-              @click="showBirthday = true"
+              placeholder="出生日期"
               name="aac006"
               v-model="info.aac006"
             />
@@ -162,9 +159,12 @@
               input-align="right"
               required
               readonly
+              is-link
               label="参保日期"
               placeholder="请选择参保日期"
               name="aac030_170"
+              :disabled="isChangeTime"
+              @click="onInsured"
               v-model="info.aac030_170"
             />
             <van-field
@@ -178,6 +178,12 @@
               @click="gradeModal"
               v-model="info.caz289_170"
             />
+            <div class="p44" v-show="isshow">
+              <span class="tips-color">温馨提示:</span>
+              <span class="ml5 h-line30 tips-color">
+                100档次仅限低保、特困人员、重度残疾人、贫困残疾人、建档立卡贫困人员等特殊人员选择参保。且需在材料上传步骤中上传特殊群体证明材料。
+              </span>
+            </div>
           </div>
           <div v-if="active === 2">
             <div class="from-info-title">
@@ -199,7 +205,7 @@
                 <h3>
                   <span class="required-red">*</span>
                   <span class="title">
-                    1.《城乡居民基本养老保险参保登记表》
+                    1、《城乡居民基本养老保险参保登记表》
                   </span>
                 </h3>
                 <div class="autograph">
@@ -226,7 +232,11 @@
               <!--材料上传-->
               <div v-for="(item, inx) in fileList.slice(1, 3)" :key="inx">
                 <h3>
-                  <span v-if="inx !== 1" class="required-red">*</span>
+                  <span
+                    v-if="inx !== 1 || gradeCode === '17001'"
+                    class="required-red"
+                    >*</span
+                  >
                   <span class="title">
                     {{ inx + 2 }}、{{ item.doc_name }}
                   </span>
@@ -417,7 +427,7 @@
         @confirm="onGrade"
       />
     </van-popup>
-    <!-- 生日 -->
+    <!-- 参保日期 -->
     <van-popup v-model="showTime" position="bottom">
       <van-datetime-picker
         v-model="currentDate"
@@ -490,6 +500,7 @@ export default {
       showSign: false, // 显示签名
       showImg: false, // 预览表格
       isDisable: false, // 是否禁用提交/下一步
+      isChangeTime: true,
       sexArr: [
         { text: '男', value: '1' },
         { text: '女', value: '2' },
@@ -603,6 +614,8 @@ export default {
       gradeCode: '', // 缴费档次代码
       cab139: '', // 参保地代码
       aaf019: '',
+      insuredDate: '',
+      isshow: false,
       auto: require('@/assets/images/icon/autograph.png'),
       fileList: [
         {
@@ -628,7 +641,6 @@ export default {
           doc: [],
         },
       ],
-
       isSign: false, // 是否签名中
       tableImg: '', // 生成表格图片
       signImg: '', // 签名后的图片
@@ -648,11 +660,22 @@ export default {
   },
   created() {},
   methods: {
+    validator(val) {
+      if (this.matchIDCard.test(val)) {
+        this.info.aac006 = this.$common.getAnalysisIdCard(val, 1)
+        this.info.aac004 = this.$common.getAnalysisIdCard(val, 2)
+        this.info.aac004 === '男' ? (this.sexCode = '1') : (this.sexCode = '2')
+      }
+      return this.matchIDCard.test(val)
+    },
     prev() {
       --this.active
       this.active < 0 ? (this.active = 0) : this.active
       if (this.active === 1) {
         this.resultImg = ''
+      }
+      if (this.active === 0) {
+        this.isDisable = false
       }
     },
     async next() {
@@ -750,10 +773,19 @@ export default {
       this.info.aac006 = this.formatter(date)
       this.showBirthday = false
     },
+    onInsured() {
+      this.showTime = true
+      this.currentDate = new Date(this.info.aac030_170)
+    },
     // 参保日期
     timeConfirm(date) {
-      this.info.aac030_170 = this.formatter(date)
-      this.showTime = false
+      let d = this.$common.comopareDate(this.formatter(date), this.insuredDate)
+      if (d !== -1) {
+        this.info.aac030_170 = this.formatter(date)
+        this.showTime = false
+      } else {
+        this.$toast('选择的时间不能小于' + this.insuredDate)
+      }
     },
     // 民族选择
     onNation(v) {
@@ -963,13 +995,13 @@ export default {
     // 社区选择
     async onCommunity(v) {
       let res = await this.getAddrInfo(v.code)
-      if (res === '1') {
+      if (res.apply_flag === '1') {
         this.info.community = v.text
-        this.communityCode = v.code
+        this.communityCode = res.aaf030
         this.showCommunity = false
         this.isDisable = false
         await this.getTime()
-      } else if (res === '0') {
+      } else if (res.apply_flag === '0') {
         this.$toast('您选择的社区暂时无法参保')
         this.isDisable = true
       }
@@ -979,7 +1011,7 @@ export default {
       let modal = {
         cab139: this.cab139,
         aac006: this.info.aac006,
-        aac009: this.info.aac009,
+        aac009: this.HkCode,
       }
       if (modal.cab139 === '') {
         this.$toast('请选择社区')
@@ -990,7 +1022,14 @@ export default {
         modal
       )
       if (data.code === 0) {
-        this.info.aac030_170 = data.data.aac030_170
+        this.isChangeTime = false
+        this.insuredDate = data.data.aac030_170
+        if (this.info.aac030_170 !== '') {
+          this.$dialog({
+            message: '您修改了参保社区，您选择的参保日期已重置为当前时间',
+          })
+        }
+        this.info.aac030_170 = this.formatter(new Date())
       }
     },
     // 缴费档次选择
@@ -998,6 +1037,7 @@ export default {
       this.info.caz289_170 = v.text
       this.gradeCode = v.code
       this.showGrade = false
+      this.gradeCode === '17001' ? (this.isshow = true) : (this.isshow = false)
       console.log(this.gradeCode)
     },
     // 重组民族数据
@@ -1022,7 +1062,7 @@ export default {
       if (data.code === 0) {
         this.cab139 = data.data.cab139
         this.aaf019 = data.data.aaf019
-        return data.data.apply_flag
+        return data.data
       }
       if (data.code === 2000 || data.code === 3000) {
         this.$toast(data.msg)
@@ -1049,8 +1089,7 @@ export default {
           filename: res.data.filename,
           yab003: that.cab139,
         })
-      }
-      if (res.code === 3001) {
+      } else {
         file.status = 'failed'
         file.message = '上传失败'
         that.$toast.fail(res.msg)
@@ -1196,8 +1235,8 @@ export default {
     // },
     async onSubmit() {
       // console.log(this.uploads)
-
-      const filelist = this.fileList.map(v => ({
+      let that = this
+      const filelist = that.fileList.map(v => ({
         doc_name: v.doc_name,
         doc_code: v.doc_code,
         scan_num: v.scan_num,
@@ -1207,7 +1246,10 @@ export default {
       let fild = false
       try {
         filelist.forEach(function(item, index) {
-          if (item.doc.length === 0 && index !== 2) {
+          if (
+            item.doc.length === 0 &&
+            (index !== 2 || that.gradeCode === '17001')
+          ) {
             fild = true
           }
         })
@@ -1215,41 +1257,41 @@ export default {
         console.error(e)
       }
       if (fild) {
-        this.$toast('带*号为必传项，请检查')
+        that.$toast('带*号为必传项，请检查')
         return
       }
       const modal = {
-        aaf030: this.communityCode,
-        aac002: this.info.aac002,
-        aac003: this.info.aac003,
-        aac004: this.sexCode, // 性别
-        aac006: this.info.aac006, // 出生年月日,
-        aac005: this.nationCode, // 民族
-        aac009: this.HkCode,
-        aac010: this.info.aac010,
-        aac030_170: this.info.aac030_170, // 参保时间
-        caz289_170: this.gradeCode, // 缴费档次
-        aae005: this.info.aae005, // 电话
-        cab139: this.cab139,
-        aaf019: this.aaf019,
-        aac058: this.HkCode,
+        aaf030: that.communityCode,
+        aac002: that.info.aac002,
+        aac003: that.info.aac003,
+        aac004: that.sexCode, // 性别
+        aac006: that.info.aac006, // 出生年月日,
+        aac005: that.nationCode, // 民族
+        aac009: that.HkCode,
+        aac010: that.info.aac010,
+        aac030_170: that.info.aac030_170, // 参保时间
+        caz289_170: that.gradeCode, // 缴费档次
+        aae005: that.info.aae005, // 电话
+        cab139: that.cab139,
+        aaf019: that.aaf019,
+        aac058: that.HkCode,
         file_list: filelist,
       }
       //  console.log(JSON.stringify(modal))
 
-      this.$dialog
+      that.$dialog
         .confirm({
           title: '',
           message: '是否确认提交居民参保登记',
         })
         .then(async () => {
-          let { data } = await this.$http.postRequest(
+          let { data } = await that.$http.postRequest(
             '/api/gxrswx/Residentbase/residentReg',
             modal
           )
           if (data.code === 0) {
             console.log(data)
-            this.$router.push({
+            that.$router.push({
               name: 'ToExamine',
               query: {
                 id: '',
@@ -1258,7 +1300,7 @@ export default {
             })
           }
           if (data.code === 3001) {
-            this.$toast(data.msg)
+            that.$toast(data.msg)
           }
         })
         .catch(() => {})
@@ -1410,5 +1452,22 @@ export default {
 }
 .van-ellipsis {
   line-height: 50px;
+}
+.resident-from .van-field__error-message {
+  text-align: right;
+}
+.p44 {
+  padding: 44px 31px;
+  font-size: 24px;
+  color: #666666;
+}
+.tips-color {
+  color: #f45936;
+}
+.ml5 {
+  margin-left: 10px;
+}
+.h-line30 {
+  line-height: 30px;
 }
 </style>
