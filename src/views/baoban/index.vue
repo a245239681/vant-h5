@@ -57,7 +57,7 @@ export default {
           title: '社会保障卡启用',
           details: '(社保功能激活)',
           icon: require('@/assets/images/baoban/41.png'),
-          url: 'https://gxrswx.healthan.net/card/home/cardActLogin',
+          url: '/activation',
         },
         {
           title: '社会保障卡',
@@ -124,7 +124,6 @@ export default {
     },
     go(item) {
       if (
-        item.title + item.details === '社会保障卡启用(社保功能激活)' ||
         item.title + item.details === '社会保障卡申领' ||
         item.title + item.details === '社会保障卡补卡'
       ) {
