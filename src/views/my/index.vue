@@ -177,7 +177,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .fc-head {
   background-color: #e2e5ed;
 }
@@ -269,5 +269,8 @@ export default {
 }
 .my [class*='van-hairline']::after {
   border-color: #f1f1f1;
+}
+/deep/ .van-tabbar {
+  background-color: #f8f8f8;
 }
 </style>

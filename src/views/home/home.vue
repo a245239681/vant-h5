@@ -568,8 +568,8 @@ export default {
 }
 </script>
 
-<style>
-body {
+<style lang="scss" scoped>
+.home {
   background-color: #f4f7fd;
 }
 .my-box {
@@ -690,18 +690,18 @@ body {
   padding-bottom: 20px;
 }
 
-.home .van-swipe__indicator {
+/deep/ .van-swipe__indicator {
   background-color: #7db1ee;
 }
 
-.home .van-swipe__indicator--active {
+/deep/ .van-swipe__indicator--active {
   background-color: #1989fa;
   padding: 0px 5px;
   opacity: 1;
   border-radius: 8px;
 }
 
-.home .van-swipe__indicators {
+/deep/ .van-swipe__indicators {
   bottom: 0;
 }
 .my-box .head-o .van-grid-item__content {
@@ -825,7 +825,7 @@ body {
   left: 30px;
 }
 
-.home .van-grid-item__text {
+/deep/ .van-grid-item__text {
   color: #333333;
   font-size: 30px;
   word-wrap: break-word;
@@ -835,7 +835,7 @@ body {
   -webkit-box-pack: start;
 }
 
-.home .public-nav .van-grid-item__text {
+/deep/ .public-nav .van-grid-item__text {
   font-size: 30px;
 }
 
@@ -863,14 +863,14 @@ body {
   display: block;
 }
 
-.home .h3 {
+/deep/ .h3 {
   font-size: 28px;
   font-weight: bold;
   color: #333333;
   padding-bottom: 20px;
 }
 
-.home .p {
+/deep/ .p {
   font-size: 24px;
   font-weight: 500;
   color: #666666;
@@ -885,32 +885,32 @@ body {
   display: block;
   height: auto;
 }
-.home .van-tabbar {
+/deep/ .van-tabbar {
   height: 140px;
 }
-.home .erweima {
+/deep/ .erweima {
   width: 100px;
   margin-top: -80px;
   position: relative;
   z-index: 9;
 }
-.home .img-responsive > img {
+/deep/ .img-responsive > img {
   border-radius: 20px;
 }
-.home [class*='van-hairline']::after {
+/deep/ [class*='van-hairline']::after {
   border-color: #f1f1f1;
 }
 
-.home .van-tabbar-item {
+/deep/ .van-tabbar-item {
   color: #666666;
   font-size: 24px;
 }
 
-.home .van-tabbar-item--active {
+/deep/ .van-tabbar-item--active {
   color: #1989fa;
 }
 
-.home .van-tabbar {
+/deep/ .van-tabbar {
   background-color: #f8f8f8;
 }
 
@@ -939,7 +939,7 @@ body {
   display: block;
   height: auto;
 }
-.home .van-grid-item__content {
+/deep/ .van-grid-item__content {
   background-color: #f4f7ff;
 }
 .pr60 {

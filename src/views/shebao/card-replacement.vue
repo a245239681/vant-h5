@@ -98,6 +98,25 @@
         placeholder="请输入手机号"
       />
       <van-field
+        v-model="info.sms_code"
+        required
+        center
+        clearable
+        label="短信验证码"
+        placeholder="请输入短信验证码"
+      >
+        <template #button>
+          <van-button
+            native-type="button"
+            size="small"
+            @click="getVerifyCode"
+            :disabled="isDisableSms"
+            type="primary"
+            >{{ smsText }}</van-button
+          >
+        </template>
+      </van-field>
+      <van-field
         class="modify-input"
         input-align="right"
         readonly
@@ -502,6 +521,8 @@ export default {
          * 联系电话
          */
         phone: '',
+        /**短信验证码 */
+        sms_code: '',
         /**
          * 银行类型
          */
@@ -523,6 +544,10 @@ export default {
          */
         agentPhone: '',
       },
+      smsText: '发送验证码',
+      /**是否禁用短信发送按钮 */
+      isDisableSms: false,
+      timer: null, //倒计时
       tipText: '',
       tips: '小区/单元/室或村/屯/门牌号',
       /**
@@ -753,6 +778,56 @@ export default {
         }
       }
       return theRequest
+    },
+    async getVerifyCode() {
+      let _this = this
+      if (_this.validatePhone()) {
+        _this.validateBtn()
+        const modal = {
+          mobile: _this.info.phone,
+          type: 'card',
+        }
+        try {
+          let { data } = await _this.$http.postRequest(
+            '/api/gxrswx/Sms/verifyMobile',
+            modal
+          )
+          data.code === 0
+            ? _this.$toast('短信发送成功')
+            : _this.$toast.fail({ message: data.msg })
+        } catch (err) {
+          clearInterval(_this.timer)
+          _this.$toast.fail('发送失败，请重试')
+          console.error(err)
+        }
+      }
+    },
+
+    validatePhone() {
+      if (this.info.phone === '') {
+        this.$toast.fail('手机号不能为空')
+        return false
+      } else if (!/^1[345678]\d{9}$/.test(this.info.phone)) {
+        this.$toast.fail('请输入正确是手机号')
+        return false
+      } else {
+        return true
+      }
+    },
+    validateBtn() {
+      let _this = this
+      let time = 60
+      _this.timer = setInterval(() => {
+        if (time === 0) {
+          clearInterval(_this.timer)
+          _this.smsText = '发送验证码'
+          _this.isDisableSms = false
+        } else {
+          _this.isDisableSms = true
+          _this.smsText = time + '秒后重试'
+          time--
+        }
+      }, 1000)
     },
     /**
      * 获取参保人信息
@@ -1241,6 +1316,8 @@ export default {
          * 联系电话
          */
         bae017: that.info.phone,
+        /**短信验证码 */
+        sms_code: that.info.sms_code,
         /**
          * 省
          */
@@ -1289,6 +1366,10 @@ export default {
       }
       if (model.bae017 === '') {
         this.$toast.fail('请输入联系电话')
+        return
+      }
+      if (model.sms_code === '') {
+        this.$toast.fail('请输入短信验证码')
         return
       }
       if (!reg.test(model.bae017)) {
@@ -1346,7 +1427,7 @@ export default {
         this.$toast.fail('请选择领卡方式')
         return
       }
-
+      // /api/gxrswx/Card/cardReissue
       that.$http.postJson('/api/gxrswx/Card/cardReissue', model, res => {
         if (res.data.code === 0) {
           let msg = '提交成功'
@@ -1364,10 +1445,8 @@ export default {
                 location.href = res.data.data.url
               }
             })
-        } else if (res.data.code === 3001) {
-          that.$dialog.alert({ message: res.data.msg })
         } else {
-          that.$dialog.alert({ message: '补卡失败，稍后重试' })
+          that.$dialog.alert({ message: res.data.msg })
         }
       })
     },
